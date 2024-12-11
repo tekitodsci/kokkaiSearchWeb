@@ -7,12 +7,11 @@ interface ResultChartProps {
   keyword: string;
 }
 
-export const ResultChart: React.FC<ResultChartProps> = ({ data, keyword }) => {
+export const ResultChart: React.FC<ResultChartProps> = ({ data }) => {
   if (data.length === 0) return null;
 
   return (
     <div className="w-full h-[400px]">
-      <h2 className="text-lg font-semibold mb-4">「{keyword}」の出現回数推移</h2>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
