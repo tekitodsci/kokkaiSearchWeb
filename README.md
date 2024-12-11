@@ -1,7 +1,7 @@
 # 国会会議録キーワード出現回数
 
 国会会議録APIを利用し、指定したキーワードの出現回数の推移を  
-可視化するWebアプリのコードです。[以前自分が書いたコード](https://github.com/tekitodsci/kokkaiSearch)を  
+可視化するWebアプリのコードです。[以前自分が書いたPythonのコード](https://github.com/tekitodsci/kokkaiSearch)を  
 Boltに与えて生成しました。
 
 ## Webアプリ
