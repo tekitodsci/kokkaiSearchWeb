@@ -9,9 +9,46 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [keyword, setKeyword] = React.useState('');
   const [startYear, setStartYear] = React.useState(2000);
   const [endYear, setEndYear] = React.useState(2024);
+  const [error, setError] = React.useState('');
+
+  const handleStartYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const numValue = parseInt(value);
+    
+    if (value === '') {
+      setStartYear(1947);
+    } else if (!isNaN(numValue) && numValue >= 1947 && numValue <= 2024) {
+      setStartYear(numValue);
+      setError('');
+    }
+  };
+
+  const handleEndYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const numValue = parseInt(value);
+    
+    if (value === '') {
+      setEndYear(2024);
+    } else if (!isNaN(numValue) && numValue >= 1947 && numValue <= 2024) {
+      setEndYear(numValue);
+      setError('');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (startYear > endYear) {
+      setError('開始年は終了年より前の年を選択してください');
+      return;
+    }
+    
+    if (keyword.trim() === '') {
+      setError('キーワードを入力してください');
+      return;
+    }
+    
+    setError('');
     onSearch(keyword, startYear, endYear);
   };
 
@@ -27,6 +64,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="検索キーワードを入力"
           required
         />
       </div>
@@ -42,7 +80,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             min="1947"
             max="2024"
             value={startYear}
-            onChange={(e) => setStartYear(parseInt(e.target.value))}
+            onChange={handleStartYearChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -57,11 +95,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             min="1947"
             max="2024"
             value={endYear}
-            onChange={(e) => setEndYear(parseInt(e.target.value))}
+            onChange={handleEndYearChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
       </div>
+
+      {error && (
+        <div className="text-red-600 text-sm">{error}</div>
+      )}
 
       <button
         type="submit"
