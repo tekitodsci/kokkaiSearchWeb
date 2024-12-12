@@ -7,7 +7,7 @@ interface ResultChartProps {
 }
 
 // より目に優しい配色
-const COLORS = ['#4f46e5', '#059669', '#b45309'];
+export const COLORS = ['#4f46e5', '#059669', '#b45309'];
 
 export const ResultChart: React.FC<ResultChartProps> = ({ data }) => {
   const allYears = Object.values(data).flat().map(d => d.year);
@@ -50,15 +50,17 @@ export const ResultChart: React.FC<ResultChartProps> = ({ data }) => {
             height={36}
           />
           {Object.keys(data).map((keyword, index) => (
-            <Line
-              key={keyword}
-              type="monotone"
-              dataKey={keyword}
-              name={keyword}
-              stroke={COLORS[index]}
-              strokeWidth={2}
-              dot={{ fill: COLORS[index] }}
-            />
+            keyword !== '' && (
+              <Line
+                key={keyword}
+                type="monotone"
+                dataKey={keyword}
+                name={keyword}
+                stroke={COLORS[index]}
+                strokeWidth={2}
+                dot={{ fill: COLORS[index] }}
+              />
+            )
           ))}
         </LineChart>
       </ResponsiveContainer>

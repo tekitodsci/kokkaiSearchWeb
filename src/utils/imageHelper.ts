@@ -1,21 +1,50 @@
+import { COLORS } from '../components/ResultChart';
+
 export const downloadChartImage = (keywords: string[]) => {
   const svgElement = document.querySelector('.recharts-wrapper svg');
   if (!svgElement) return;
 
-  // Create a clone of the SVG to modify
+  // Create a clone of the SVG
   const svgClone = svgElement.cloneNode(true) as SVGElement;
   
-  // Add title with keywords
-  const titleText = keywords.filter(k => k !== '').join('、');
-  if (titleText) {
-    const titleElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    titleElement.setAttribute('x', '50%');
-    titleElement.setAttribute('y', '20');
-    titleElement.setAttribute('text-anchor', 'middle');
-    titleElement.setAttribute('font-size', '14');
-    titleElement.setAttribute('font-family', 'sans-serif');
-    titleElement.textContent = `キーワード：${titleText}`;
-    svgClone.appendChild(titleElement);
+  // キーワードと色の組み合わせを表示
+  const filteredKeywords = keywords.filter(k => k !== '');
+  if (filteredKeywords.length > 0) {
+    const legendGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    legendGroup.setAttribute('transform', 'translate(50, 20)');
+
+    filteredKeywords.forEach((keyword, index) => {
+      const color = COLORS[index];
+      
+      // キーワードごとのグループ
+      const itemGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      itemGroup.setAttribute('transform', `translate(${index * 200}, 0)`);
+      
+      // 色のマーカー
+      const marker = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      marker.setAttribute('x1', '0');
+      marker.setAttribute('y1', '0');
+      marker.setAttribute('x2', '20');
+      marker.setAttribute('y2', '0');
+      marker.setAttribute('stroke', color);
+      marker.setAttribute('stroke-width', '2');
+      
+      // キーワードテキスト
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', '30');
+      text.setAttribute('y', '0');
+      text.setAttribute('dy', '0.32em');
+      text.setAttribute('font-size', '12');
+      text.setAttribute('font-family', 'sans-serif');
+      text.setAttribute('fill', color);
+      text.textContent = keyword;
+      
+      itemGroup.appendChild(marker);
+      itemGroup.appendChild(text);
+      legendGroup.appendChild(itemGroup);
+    });
+
+    svgClone.appendChild(legendGroup);
   }
 
   const svgData = new XMLSerializer().serializeToString(svgClone);
