@@ -74,31 +74,30 @@ function App() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">検索結果</h2>
-            <div className="space-x-2">
-              <button
-                onClick={handleDownloadCSV}
-                className="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                CSVダウンロード
-              </button>
-              <button
-                onClick={() => downloadChartImage(Object.keys(results))}
-                className="inline-flex items-center px-4 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-              >
-                <Image className="w-4 h-4 mr-2" />
-                画像ダウンロード
-              </button>
-            </div>
-          </div>
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : (
-            <ResultChart data={results} />
+            <>
+              <ResultChart data={results} />
+              <div className="mt-6 flex justify-center space-x-4">
+                <button
+                  onClick={handleDownloadCSV}
+                  className="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  CSVダウンロード
+                </button>
+                <button
+                  onClick={() => downloadChartImage(Object.keys(results))}
+                  className="inline-flex items-center px-4 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                >
+                  <Image className="w-4 h-4 mr-2" />
+                  画像ダウンロード
+                </button>
+              </div>
+            </>
           )}
         </div>
 
