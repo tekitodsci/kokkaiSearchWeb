@@ -2,14 +2,20 @@ import React from 'react';
 import { Search } from 'lucide-react';
 
 interface SearchFormProps {
-  onSearch: (keyword: string, startYear: number, endYear: number) => void;
+  onSearch: (keywords: string[], startYear: number, endYear: number) => void;
 }
 
 export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
-  const [keyword, setKeyword] = React.useState('');
+  const [keywords, setKeywords] = React.useState(['', '', '']);
   const [startYear, setStartYear] = React.useState(2000);
   const [endYear, setEndYear] = React.useState(2024);
   const [error, setError] = React.useState('');
+
+  const handleKeywordChange = (index: number, value: string) => {
+    const newKeywords = [...keywords];
+    newKeywords[index] = value;
+    setKeywords(newKeywords);
+  };
 
   const handleStartYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -43,31 +49,36 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
       return;
     }
     
-    if (keyword.trim() === '') {
-      setError('キーワードを入力してください');
+    if (keywords.every(k => k.trim() === '')) {
+      setError('少なくとも1つのキーワードを入力してください');
       return;
     }
     
     setError('');
-    onSearch(keyword, startYear, endYear);
+    onSearch(keywords.filter(k => k.trim() !== ''), startYear, endYear);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="keyword" className="block text-sm font-medium text-gray-700">
-          キーワード
-        </label>
-        <input
-          type="text"
-          id="keyword"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="検索キーワードを入力"
-          required
-        />
-      </div>
+      {[
+        { label: 'キーワード1', placeholder: '例）脱炭素' },
+        { label: 'キーワード2', placeholder: '例）省エネ' },
+        { label: 'キーワード3', placeholder: '例）再生可能エネルギー' }
+      ].map((field, index) => (
+        <div key={field.label} className="space-y-2">
+          <label htmlFor={`keyword${index + 1}`} className="block text-sm font-medium text-gray-700">
+            {field.label}
+          </label>
+          <input
+            type="text"
+            id={`keyword${index + 1}`}
+            value={keywords[index]}
+            onChange={(e) => handleKeywordChange(index, e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder={field.placeholder}
+          />
+        </div>
+      ))}
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -82,7 +93,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             value={startYear}
             onChange={handleStartYearChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="例）1947"
           />
+          <p className="text-xs text-gray-500">※第1回国会が開催された1947年から指定可能です</p>
         </div>
         
         <div className="space-y-2">
@@ -97,6 +110,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             value={endYear}
             onChange={handleEndYearChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="例）2020"
           />
         </div>
       </div>

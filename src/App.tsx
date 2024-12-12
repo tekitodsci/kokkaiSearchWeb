@@ -1,29 +1,33 @@
 import React, { useState } from 'react';
 import { SearchForm } from './components/SearchForm';
 import { ResultChart } from './components/ResultChart';
+import { Footer } from './components/Footer';
 import { fetchKokkaiData } from './services/kokkaiApi';
 import { downloadCSV } from './utils/csvHelper';
+import { downloadChartImage } from './utils/imageHelper';
 import type { SearchResult } from './types';
-import { Database, Download } from 'lucide-react';
+import { Database, Download, Image } from 'lucide-react';
 
 function App() {
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [keyword, setKeyword] = useState('');
+  const [results, setResults] = useState<{ [key: string]: SearchResult[] }>({});
   const [loading, setLoading] = useState(false);
 
-  const handleSearch = async (searchKeyword: string, startYear: number, endYear: number) => {
+  const handleSearch = async (keywords: string[], startYear: number, endYear: number) => {
     setLoading(true);
-    setKeyword(searchKeyword);
     
     try {
-      const searchResults: SearchResult[] = [];
+      const newResults: { [key: string]: SearchResult[] } = {};
       
-      for (let year = startYear; year <= endYear; year++) {
-        const count = await fetchKokkaiData(searchKeyword, year);
-        searchResults.push({ year, count });
+      for (const keyword of keywords) {
+        const keywordResults: SearchResult[] = [];
+        for (let year = startYear; year <= endYear; year++) {
+          const count = await fetchKokkaiData(keyword, year);
+          keywordResults.push({ year, count });
+        }
+        newResults[keyword] = keywordResults;
       }
       
-      setResults(searchResults);
+      setResults(newResults);
     } catch (error) {
       console.error('Error during search:', error);
     } finally {
@@ -32,8 +36,13 @@ function App() {
   };
 
   const handleDownloadCSV = () => {
-    if (results.length > 0) {
-      downloadCSV(results, keyword);
+    if (Object.keys(results).length > 0) {
+      downloadCSV(
+        Object.entries(results).flatMap(([keyword, data]) => 
+          data.map(d => ({ ...d, keyword }))
+        ),
+        Object.keys(results).join('_')
+      );
     }
   };
 
@@ -44,7 +53,7 @@ function App() {
       year: currentYear - 4 + index,
       count: 0
     }));
-    setResults(initialData);
+    setResults({ '': initialData });
   }, []);
 
   return (
@@ -56,7 +65,7 @@ function App() {
             <h1 className="text-2xl font-bold text-gray-900">国会会議録キーワード出現回数</h1>
           </div>
           <p className="text-gray-600 text-center">
-            指定したキーワードが国会会議録に何回出現するかを折れ線グラフで示します。
+            指定したキーワードが国会会議録に何回出現するかを折れ線グラフで示します。キーワードは3つまで指定できます。
           </p>
         </div>
 
@@ -67,22 +76,33 @@ function App() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">検索結果</h2>
-            <button
-              onClick={handleDownloadCSV}
-              className="flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              CSVダウンロード
-            </button>
+            <div className="space-x-2">
+              <button
+                onClick={handleDownloadCSV}
+                className="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                CSVダウンロード
+              </button>
+              <button
+                onClick={() => downloadChartImage(Object.keys(results))}
+                className="inline-flex items-center px-4 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              >
+                <Image className="w-4 h-4 mr-2" />
+                画像ダウンロード
+              </button>
+            </div>
           </div>
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : (
-            <ResultChart data={results} keyword={keyword || '(キーワードを入力してください)'} />
+            <ResultChart data={results} />
           )}
         </div>
+
+        <Footer />
       </div>
     </div>
   );
