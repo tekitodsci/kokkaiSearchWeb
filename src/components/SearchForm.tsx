@@ -59,26 +59,29 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {[
-        { label: 'キーワード1', placeholder: '例）脱炭素' },
-        { label: 'キーワード2', placeholder: '例）省エネ' },
-        { label: 'キーワード3', placeholder: '例）再生可能エネルギー' }
-      ].map((field, index) => (
-        <div key={field.label} className="space-y-2">
-          <label htmlFor={`keyword${index + 1}`} className="block text-sm font-medium text-gray-700">
-            {field.label}
-          </label>
-          <input
-            type="text"
-            id={`keyword${index + 1}`}
-            value={keywords[index]}
-            onChange={(e) => handleKeywordChange(index, e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder={field.placeholder}
-          />
-        </div>
-      ))}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* キーワード入力欄を横並びに */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { label: 'キーワード1', placeholder: '例）脱炭素' },
+          { label: 'キーワード2', placeholder: '例）省エネ' },
+          { label: 'キーワード3', placeholder: '例）再生可能エネルギー' }
+        ].map((field, index) => (
+          <div key={field.label} className="space-y-2">
+            <label htmlFor={`keyword${index + 1}`} className="block text-sm font-medium text-gray-700">
+              {field.label}
+            </label>
+            <input
+              type="text"
+              id={`keyword${index + 1}`}
+              value={keywords[index]}
+              onChange={(e) => handleKeywordChange(index, e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder={field.placeholder}
+            />
+          </div>
+        ))}
+      </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
